@@ -490,11 +490,6 @@ void FileGenerator::GenerateSourceIncludes(io::Printer* p) {
     }
   }
 
-  if (HasCordFields(file_, options_)) {
-    p->Emit(R"(
-      #include "third_party/absl/strings/internal/string_constant.h"
-    )");
-  }
 
   p->Emit(R"cc(
     // @@protoc_insertion_point(includes)
