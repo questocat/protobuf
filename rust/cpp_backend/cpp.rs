@@ -28,37 +28,23 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-// Rust bindings for UPB
+// Rust bindings for C++ runtime
 
-/// Represents UPB's upb_Arena.
+use std::boxed::Box;
+
 #[repr(C)]
 pub struct Arena {
     _data: [u8; 0],
-    _marker: core::marker::PhantomData<(*mut u8, core::marker::PhantomPinned)>,
 }
 
 impl Arena {
     pub unsafe fn new() -> *mut Self {
-        upb_Arena_New()
+        let arena = Box::new(Arena { _data: [] });
+        Box::leak(arena) as *mut _
     }
 
     pub unsafe fn free(arena: *mut Self) {
-        upb_Arena_Free(arena)
-    }
-}
-
-extern "C" {
-    pub fn upb_Arena_New() -> *mut Arena;
-    pub fn upb_Arena_Free(arena: *mut Arena);
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_arena_new_and_free() {
-        let arena = unsafe { Arena::new() };
-        unsafe { Arena::free(arena) };
+        let arena = Box::from_raw(arena);
+        std::mem::drop(arena);
     }
 }

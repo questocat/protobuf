@@ -2,7 +2,7 @@ load("//rust:defs.bzl", "rust_proto_library")
 load("@rules_rust//rust:defs.bzl", "rust_test")
 
 rust_proto_library(
-    name = "unittest_rs_proto",
+    name = "unittest_rust_proto",
     testonly = True,
     deps = ["//third_party/protobuf:unittest_proto"],
 )
@@ -15,7 +15,7 @@ rust_test(
         "not_build:arm",
         "notsan",
     ],
-    deps = [":unittest_rs_proto"],
+    deps = [":unittest_rust_proto"],
 )
 
 proto_library(
@@ -31,12 +31,12 @@ proto_library(
 )
 
 rust_proto_library(
-    name = "parent_rs_proto",
+    name = "parent_rust_proto",
     deps = [":parent_proto"],
 )
 
 rust_proto_library(
-    name = "child_rs_proto",
+    name = "child_rust_proto",
     deps = [":child_proto"],
 )
 
@@ -49,7 +49,7 @@ rust_test(
         "notsan",
     ],
     deps = [
-        ":child_rs_proto",
-        ":parent_rs_proto",
+        ":child_rust_proto",
+        ":parent_rust_proto",
     ],
 )

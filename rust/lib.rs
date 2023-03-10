@@ -30,7 +30,12 @@
 
 //! Rust Protobuf Runtime
 
-pub use upb::*;
+#[cfg(cpp_backend)]
+extern crate cpp as __runtime;
+#[cfg(upb_backend)]
+extern crate upb as __runtime;
+
+pub use __runtime::Arena;
 
 use std::ops::Deref;
 use std::ptr::NonNull;
@@ -41,11 +46,11 @@ use std::slice;
 pub struct SerializedData {
     data: NonNull<u8>,
     len: usize,
-    arena: *mut upb_Arena,
+    arena: *mut Arena,
 }
 
 impl SerializedData {
-    pub unsafe fn from_raw_parts(arena: *mut upb_Arena, data: NonNull<u8>, len: usize) -> Self {
+    pub unsafe fn from_raw_parts(arena: *mut Arena, data: NonNull<u8>, len: usize) -> Self {
         SerializedData { arena, data, len }
     }
 }
@@ -59,7 +64,7 @@ impl Deref for SerializedData {
 
 impl Drop for SerializedData {
     fn drop(&mut self) {
-        unsafe { upb_Arena_Free(self.arena) };
+        unsafe { Arena::free(self.arena) };
     }
 }
 
@@ -69,7 +74,7 @@ mod tests {
 
     #[test]
     fn test_serialized_data_roundtrip() {
-        let arena = unsafe { upb_Arena_New() };
+        let arena = unsafe { Arena::new() };
         let original_data = b"Hello world";
         let len = original_data.len();
 
